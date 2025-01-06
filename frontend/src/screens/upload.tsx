@@ -1,5 +1,8 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import axios from "axios";
+
+const a = axios.create({ baseURL: "http://localhost:3000" });
 
 export default function Upload() {
   return (
@@ -14,11 +17,18 @@ export default function Upload() {
 
 function MyDropzone() {
   // TODO: Fix the types
-  const onDrop = useCallback((acceptedFiles: any) => {
-    console.log(acceptedFiles);
-    // Do something with the files
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onDrop = useCallback(async (acceptedFiles: any) => {
+    const formData = new FormData();
+    formData.append("file", acceptedFiles[0]);
+    const upload = await a.put("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(upload.data);
   }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
     <div {...getRootProps()}>
